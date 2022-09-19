@@ -3,11 +3,11 @@ pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-contract HelixSub {
-    uint public unlockTime;
-    address payable public owner;
+contract HelixSubs {
+    
+    address public owner;
 
-       struct  SubscriptionStruct {
+    struct  SubscriptionStruct {
        uint256 subscriptionConfigID;
        uint subscriptionTimestamp;
        uint nextDueTimestamp;
@@ -30,8 +30,12 @@ contract HelixSub {
     event SubscribeEvent( bytes32 indexed subscriptionHash, SubscriptionStruct subscriptionObject);
 
     constructor()  {
-        owner = payable(msg.sender);
+        owner = msg.sender;
     }
+
+
+
+//PUBLIC FUNCTIONS -----------------------------------------------------------------------------------
 
     function Subscribe (uint256 subscriptionConfigID,
                         address[4] memory tokenMerchantHelixCreator_addr,
@@ -94,7 +98,7 @@ contract HelixSub {
 
 
 
-//----------------PRIVATE FUNCTIONS------------------
+//PRIVATE FUNCTIONS----------------------------------------------
 
 //function to verify authenticated signature
     function isSignedBy(address signer, bytes32 msgHash, uint8 v, bytes32 r, bytes32 s) private pure  returns (bool) {      
