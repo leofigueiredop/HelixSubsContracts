@@ -98,6 +98,18 @@ contract HelixSubs {
        return true;
     }
     
+    function Unsubscribre(bytes32 subsHash) public returns (bool){
+        SubscriptionStruct memory subscription = Subscriptions[subsHash];
+
+        require(subscription.exists,"Helix::Subs not found");
+        require(subscription.active,"Helix::Subs not active");
+        require(subscription.userAddrress == msg.sender,"Helix::Only wallet that has subscribed can unsubscribe");
+
+        Subscriptions[subsHash].active = false;
+
+        return true;
+    }
+
     function Billing(bytes32[] memory subsHash) public 
     {
         require(msg.sender == owner,"Helix::Only owner can call billing function");
