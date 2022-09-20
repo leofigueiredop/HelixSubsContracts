@@ -29,6 +29,7 @@ contract HelixSubs {
 
     event SubscribeEvent( bytes32 indexed subscriptionHash, SubscriptionStruct subscriptionObject);
     event BillingEvent( bytes32 indexed subscriptionHash, SubscriptionStruct subscriptionObject);
+    event UnsubscribeEvent( bytes32 indexed subscriptionHash, SubscriptionStruct subscriptionObject);
 
     constructor()  {
         owner = msg.sender;
@@ -106,6 +107,8 @@ contract HelixSubs {
         require(subscription.userAddrress == msg.sender,"Helix::Only wallet that has subscribed can unsubscribe");
 
         Subscriptions[subsHash].active = false;
+        
+        emit UnsubscribeEvent( subsHash, subscription);
 
         return true;
     }

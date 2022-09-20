@@ -1,9 +1,13 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.0;
+pragma solidity 0.8.1;
+
+import "./ERC20_GLD.sol";
 
 contract Despachante
 { 
-
+    address pagamentoToken;
+    address owner;
+    
     struct DocumentoStruct
     {
         address ProprietarioAtual;
@@ -16,6 +20,16 @@ contract Despachante
     }
 
     mapping(uint256 => DocumentoStruct) public Documentos;
+
+    constructor()  {
+         owner = msg.sender;        
+    }
+
+    function atualizarPagamentoToken (address _pagamentoToken ) public returns (bool) {
+        require(owner == msg.sender, "Somente owner pode chamar esse metodo");
+        pagamentoToken = _pagamentoToken;
+         return true;
+    }
 
     function CadastraDocumento(uint256 renavam , string memory placa,  string memory modelo,  string memory cor, uint16 ano) external returns (DocumentoStruct memory retorno)
     {
@@ -45,7 +59,12 @@ contract Despachante
             keccak256(abi.encodePacked( documento.Ano)) ==  keccak256(abi.encodePacked(ano)), "Os dados informados nao batem com os dados salvos do veiculo.");
         
         require(documento.ProprietarioAtual == msg.sender, "A transferencia precisa ser solicitada pelo proprietario atual do veiculo.");
+
+        WrapedGold_ERC20 token = WrapedGold_ERC20(pagamentoToken);
+        require(token.balanceOf(msg.sender) >=10, "Saldo insuficiente para taxa de transferencia de 10 tokens");
         
+        token.despachanteTransfer(msg.sender, owner, 10);
+
         documento.UltimoProprietario = documento.ProprietarioAtual;
         documento.ProprietarioAtual = destinatario;
         Documentos[renavam] = documento;
