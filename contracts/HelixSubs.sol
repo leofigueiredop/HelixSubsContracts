@@ -29,6 +29,7 @@ contract HelixSubs {
 
     event SubscribeEvent( bytes32 indexed subscriptionHash, SubscriptionStruct subscriptionObject);
     event BillingEvent( bytes32 indexed subscriptionHash, SubscriptionStruct subscriptionObject);
+    event BillingError( bytes32 indexed subscriptionHash, SubscriptionStruct subscriptionObject, string reason);
     event UnsubscribeEvent( bytes32 indexed subscriptionHash, SubscriptionStruct subscriptionObject);
 
     constructor()  {
@@ -123,7 +124,12 @@ contract HelixSubs {
             require(subscription.exists,"Helix::Subs not found");
             require(subscription.active,"Helix::Subs not active");
          
-            tryBillSubscription(subsHash[i],subscription);
+            try this.tryBillSubscription(subsHash[i],subscription) returns (bool){
+
+            }catch(bytes memory reason)
+            {
+                emit BillingError(subsHash[i], subscription, string(reason));
+            }
         
         }
     }
@@ -149,7 +155,7 @@ contract HelixSubs {
        return timestamp + (recurrence * 24 * 60 *60);
     }
 
-    function tryBillSubscription(bytes32 msgHash, SubscriptionStruct memory subscription) private returns(bool sucess)
+    function tryBillSubscription(bytes32 msgHash, SubscriptionStruct memory subscription) public returns(bool sucess)
     {
         address[4] memory tokenMerchantHelixCreator_addr = [subscription.paymentToken, subscription.merchantAddress, subscription.helixAddress, subscription.creatorAddress];
         uint256[3] memory merchantHelixCreator_value = [subscription.merchantValue, subscription.hellixValue, subscription.creatorValue];
