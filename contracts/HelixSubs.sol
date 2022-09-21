@@ -133,7 +133,26 @@ contract HelixSubs {
         
         }
     }
+ function tryBillSubscription(bytes32 msgHash, SubscriptionStruct memory subscription) public returns(bool sucess)
+    {
+        address[4] memory tokenMerchantHelixCreator_addr = [subscription.paymentToken, subscription.merchantAddress, subscription.helixAddress, subscription.creatorAddress];
+        uint256[3] memory merchantHelixCreator_value = [subscription.merchantValue, subscription.hellixValue, subscription.creatorValue];
+        
+        uint256 allowance =  ERC20(tokenMerchantHelixCreator_addr[0]).allowance(msg.sender, address(this));
+        uint256 balance =  ERC20(tokenMerchantHelixCreator_addr[0]).balanceOf(msg.sender);
+        
+        require(balance >= merchantHelixCreator_value[0] + merchantHelixCreator_value[1] + merchantHelixCreator_value[2], "Helix::Insufficient funds");
+        require(allowance >= merchantHelixCreator_value[0] + merchantHelixCreator_value[1] + merchantHelixCreator_value[2], "Helix::Insufficient allowance");
 
+        ERC20(tokenMerchantHelixCreator_addr[0]).transferFrom(msg.sender,tokenMerchantHelixCreator_addr[1],merchantHelixCreator_value[0]);//merchant value
+        ERC20(tokenMerchantHelixCreator_addr[0]).transferFrom(msg.sender,tokenMerchantHelixCreator_addr[2],merchantHelixCreator_value[1]);//helix value
+        ERC20(tokenMerchantHelixCreator_addr[0]).transferFrom(msg.sender,tokenMerchantHelixCreator_addr[3],merchantHelixCreator_value[2]);//creator value
+        
+        
+        emit BillingEvent( msgHash, subscription);
+
+        return true;
+    }
 
 //PRIVATE FUNCTIONS----------------------------------------------
 
@@ -155,26 +174,7 @@ contract HelixSubs {
        return timestamp + (recurrence * 24 * 60 *60);
     }
 
-    function tryBillSubscription(bytes32 msgHash, SubscriptionStruct memory subscription) public returns(bool sucess)
-    {
-        address[4] memory tokenMerchantHelixCreator_addr = [subscription.paymentToken, subscription.merchantAddress, subscription.helixAddress, subscription.creatorAddress];
-        uint256[3] memory merchantHelixCreator_value = [subscription.merchantValue, subscription.hellixValue, subscription.creatorValue];
-        
-        uint256 allowance =  ERC20(tokenMerchantHelixCreator_addr[0]).allowance(msg.sender, address(this));
-        uint256 balance =  ERC20(tokenMerchantHelixCreator_addr[0]).balanceOf(msg.sender);
-        
-        require(balance >= merchantHelixCreator_value[0] + merchantHelixCreator_value[1] + merchantHelixCreator_value[2], "Helix::Insufficient funds");
-        require(allowance >= merchantHelixCreator_value[0] + merchantHelixCreator_value[1] + merchantHelixCreator_value[2], "Helix::Insufficient allowance");
-
-        ERC20(tokenMerchantHelixCreator_addr[0]).transferFrom(msg.sender,tokenMerchantHelixCreator_addr[1],merchantHelixCreator_value[0]);//merchant value
-        ERC20(tokenMerchantHelixCreator_addr[0]).transferFrom(msg.sender,tokenMerchantHelixCreator_addr[2],merchantHelixCreator_value[1]);//helix value
-        ERC20(tokenMerchantHelixCreator_addr[0]).transferFrom(msg.sender,tokenMerchantHelixCreator_addr[3],merchantHelixCreator_value[2]);//creator value
-        
-        
-        emit BillingEvent( msgHash, subscription);
-
-        return true;
-    }
+   
 
   
 }
