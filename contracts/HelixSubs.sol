@@ -125,6 +125,10 @@ contract HelixSubs {
             require(subscription.active,"Helix::Subs not active");
          
             try this.tryBillSubscription(subsHash[i],subscription) returns (bool){
+            
+                subscription.nextDueTimestamp = calculateNextDueTimestamp(block.timestamp,subscription.recurrence);
+
+                emit BillingEvent( msgHash, subscription);
 
             }catch(bytes memory reason)
             {
@@ -149,8 +153,6 @@ contract HelixSubs {
         ERC20(tokenMerchantHelixCreator_addr[0]).transferFrom(msg.sender,tokenMerchantHelixCreator_addr[3],merchantHelixCreator_value[2]);//creator value
         
         
-        emit BillingEvent( msgHash, subscription);
-
         return true;
     }
 
