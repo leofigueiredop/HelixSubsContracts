@@ -24,8 +24,8 @@ module.exports = {
   },
   
   etherscan: {
-     apiKey:"CI6R71WXT53PNFPB33E4M6J428WVPIKV2K", //bstteste
+     //apiKey:"CI6R71WXT53PNFPB33E4M6J428WVPIKV2K", //bstteste
      //apiKey:"V12DZM2BRXHZ8HG5UAN5HZTNIGVR1CRF4Z", //eth
-    //poly apiKey:"NE6D9Z8MQSHDAIDQX34SKAY75MUE3SBSPP",
+     apiKey:"NE6D9Z8MQSHDAIDQX34SKAY75MUE3SBSPP", //poly
   }
 };
