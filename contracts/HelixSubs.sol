@@ -8,7 +8,7 @@ contract HelixSubs {
     address public owner;
 
     struct  SubscriptionStruct {
-       uint256 subscriptionConfigID;
+       uint256 productID;
        uint subscriptionTimestamp;
        uint nextDueTimestamp;
        uint recurrence;
@@ -40,14 +40,14 @@ contract HelixSubs {
 
 //PUBLIC FUNCTIONS -----------------------------------------------------------------------------------
 
-    function Subscribe (uint256 subscriptionConfigID,
+    function Subscribe (uint256 productID,
                         address[4] memory tokenMerchantHelixCreator_addr,
                         uint256[3] memory merchantHelixCreator_value,
                         uint recurrence,
                         string memory userData,//ID/Name/Email
                         uint8 v, bytes32 r, bytes32 s) public returns(bool sucess) {
 
-        bytes32 msgHash = keccak256(abi.encodePacked(subscriptionConfigID,
+        bytes32 msgHash = keccak256(abi.encodePacked(productID,
                                                     tokenMerchantHelixCreator_addr,
                                                     merchantHelixCreator_value,
                                                     recurrence,
@@ -64,7 +64,7 @@ contract HelixSubs {
             }
             else
             {
-                if(tryBillSubscription(msgHash,subscription))
+                if(TryBillSubscription(msgHash,subscription))
                 {
                     subscription.active = true;
                     emit SubscribeEvent( msgHash, subscription);
@@ -74,7 +74,7 @@ contract HelixSubs {
         else {
              
                 //add new subscription
-                subscription.subscriptionConfigID = subscriptionConfigID;
+                subscription.productID = productID;
                 subscription.subscriptionTimestamp = block.timestamp;
                 subscription.nextDueTimestamp = calculateNextDueTimestamp(block.timestamp,recurrence);
                 subscription.recurrence = recurrence;
@@ -90,7 +90,7 @@ contract HelixSubs {
                 subscription.active = true;
                 subscription.exists = true;
 
-                if(tryBillSubscription(msgHash,subscription))
+                if(TryBillSubscription(msgHash,subscription))
                 {
                     Subscriptions[msgHash] = subscription;
                     emit SubscribeEvent( msgHash, subscription);
@@ -124,7 +124,7 @@ contract HelixSubs {
             require(subscription.exists,"Helix::Subs not found");
             require(subscription.active,"Helix::Subs not active");
             if(subscription.nextDueTimestamp < block.timestamp) {
-                try this.tryBillSubscription(subsHash[i],subscription) returns (bool){
+                try this.TryBillSubscription(subsHash[i],subscription) returns (bool){
                 
                     subscription.nextDueTimestamp = calculateNextDueTimestamp(block.timestamp,subscription.recurrence);
 
