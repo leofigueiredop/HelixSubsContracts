@@ -8,7 +8,7 @@ contract HelixSubs {
     address public owner;
 
     struct  SubscriptionStruct {
-       uint256 productID;
+       string  productID;
        uint subscriptionTimestamp;
        uint nextDueTimestamp;
        uint recurrence;
@@ -25,12 +25,12 @@ contract HelixSubs {
        bool exists;
     }
     
-    mapping (bytes32 => SubscriptionStruct) Subscriptions;
+    mapping  (bytes32 => SubscriptionStruct)  Subscriptions;
 
-    event SubscribeEvent( bytes32 indexed subscriptionHash, SubscriptionStruct subscriptionObject);
-    event BillingEvent( bytes32 indexed subscriptionHash, SubscriptionStruct subscriptionObject);
-    event BillingError( bytes32 indexed subscriptionHash, SubscriptionStruct subscriptionObject, string reason);
-    event UnsubscribeEvent( bytes32 indexed subscriptionHash, SubscriptionStruct subscriptionObject);
+    event SubscribeEvent( bytes32  subscriptionHash, SubscriptionStruct subscriptionObject);
+    event BillingEvent( bytes32  subscriptionHash, SubscriptionStruct subscriptionObject);
+    event BillingError( bytes32  subscriptionHash, SubscriptionStruct subscriptionObject, string reason);
+    event UnsubscribeEvent( bytes32  subscriptionHash, SubscriptionStruct subscriptionObject);
 
     constructor()  {
         owner = msg.sender;
@@ -40,12 +40,12 @@ contract HelixSubs {
 
 //PUBLIC FUNCTIONS -----------------------------------------------------------------------------------
 
-    function Subscribe (uint256 productID,
-                        address[4] memory tokenMerchantHelixCreator_addr,
-                        uint256[3] memory merchantHelixCreator_value,
+    function Subscribe (string calldata productID,
+                        address[4] calldata tokenMerchantHelixCreator_addr,
+                        uint256[3] calldata merchantHelixCreator_value,
                         uint recurrence,
-                        string memory userData,//ID/Name/Email
-                        uint8 v, bytes32 r, bytes32 s) public returns(bool sucess) {
+                        string calldata userData,//ID/Name/Email
+                        uint8 v, bytes32 r, bytes32 s) public returns( bool sucess) {
 
         bytes32 msgHash = keccak256(abi.encodePacked(productID,
                                                     tokenMerchantHelixCreator_addr,
@@ -64,7 +64,7 @@ contract HelixSubs {
             }
             else
             {
-                if(TryBillSubscription(msgHash,subscription))
+                if(TryBillSubscription(subscription))
                 {
                     subscription.active = true;
                     emit SubscribeEvent( msgHash, subscription);
@@ -90,7 +90,7 @@ contract HelixSubs {
                 subscription.active = true;
                 subscription.exists = true;
 
-                if(TryBillSubscription(msgHash,subscription))
+                if(TryBillSubscription(subscription))
                 {
                     Subscriptions[msgHash] = subscription;
                     emit SubscribeEvent( msgHash, subscription);
@@ -114,7 +114,7 @@ contract HelixSubs {
         return true;
     }
 
-    function Billing(bytes32[] memory subsHash) public 
+    function Billing(bytes32[] calldata subsHash) public returns (bool)
     {
         require(msg.sender == owner,"Helix::Only owner can call billing function");
         for (uint i = 0; i < subsHash.length; i++) {
@@ -124,7 +124,7 @@ contract HelixSubs {
             require(subscription.exists,"Helix::Subs not found");
             require(subscription.active,"Helix::Subs not active");
             if(subscription.nextDueTimestamp < block.timestamp) {
-                try this.TryBillSubscription(subsHash[i],subscription) returns (bool){
+                try this.TryBillSubscription(subscription) returns (bool){
                 
                     subscription.nextDueTimestamp = calculateNextDueTimestamp(block.timestamp,subscription.recurrence);
 
@@ -136,8 +136,9 @@ contract HelixSubs {
                 }
             }
         }
+        return true;
     }
- function TryBillSubscription(bytes32 msgHash, SubscriptionStruct memory subscription) public returns(bool)
+ function TryBillSubscription( SubscriptionStruct memory subscription) public returns(bool)
     {
         address[4] memory tokenMerchantHelixCreator_addr = [subscription.paymentToken, subscription.merchantAddress, subscription.helixAddress, subscription.creatorAddress];
         uint256[3] memory merchantHelixCreator_value = [subscription.merchantValue, subscription.hellixValue, subscription.creatorValue];

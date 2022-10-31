@@ -10,16 +10,22 @@ module.exports = {
     },
     bsctest: {  
     url: 'https://data-seed-prebsc-1-s1.binance.org:8545',
-    accounts: ['b2640088b2fb0c3484de1add4c41f9814f225d91788b5cdf58869d116803ad3c']
+   // accounts: ['b2640088b2fb0c3484de1add4c41f9814f225d91788b5cdf58869d116803ad3c'],
+    accounts: ['f808fb48dbfc717b02053e5abe31a05967ca12bae6e217c7025ce70e1a67755f'],
+
+    
     },
     mumbai: {
-      url: 'https://rpc-mumbai.matic.today',
-      accounts: ['8d89f4db44390b327165d38c2160d6c1f352e0b929a704d402fa3bad2aa279d3']
+      url: 'https://rpc-mumbai.maticvigil.com',
+      accounts: ['f808fb48dbfc717b02053e5abe31a05967ca12bae6e217c7025ce70e1a67755f'],
+      chainId:80001
     },
     polygon: {
       url: 'https://polygon-rpc.com',
-      accounts:['287c97ccc5a13adb270cb407a153ae7580fc38cc800fb1a1542228955684c7fe'],//pvt MetakitOwner
-      
+      chainId: 137,
+      accounts: ['b2640088b2fb0c3484de1add4c41f9814f225d91788b5cdf58869d116803ad3c'],
+    //accounts: ['f808fb48dbfc717b02053e5abe31a05967ca12bae6e217c7025ce70e1a67755f'],//pvt housemagOwner
+      gasPrice:100000000000, gasLimit: 1000000
     }
   },
   
