@@ -178,8 +178,8 @@ async function main() {
     v, r, s
   ])
   console.log("v",v);
-console.log("r",r);
-console.log("s",s);
+  console.log("r",r);
+  console.log("s",s);
   // let tx = await signer.sendTransaction({
   //   from: signerAddress,
   //   to: tokenAddress,
