@@ -1,3 +1,5 @@
+const { Network } = require("alchemy-sdk");
+
 require("@nomicfoundation/hardhat-toolbox");
 
 /** @type import('hardhat/config').HardhatUserConfig */
@@ -11,21 +13,28 @@ module.exports = {
     bsctest: {  
     url: 'https://data-seed-prebsc-1-s1.binance.org:8545',
    // accounts: ['b2640088b2fb0c3484de1add4c41f9814f225d91788b5cdf58869d116803ad3c'],
-    accounts: ['f808fb48dbfc717b02053e5abe31a05967ca12bae6e217c7025ce70e1a67755f'],
-
-    
+    accounts: ['f808fb48dbfc717b02053e5abe31a05967ca12bae6e217c7025ce70e1a67755f'],    
     },
     mumbai: {
-      url: 'https://rpc-mumbai.maticvigil.com',
-      accounts: ['f808fb48dbfc717b02053e5abe31a05967ca12bae6e217c7025ce70e1a67755f'],
+      url: 'https://rpc-mumbai.matic.today',
+     // accounts: ['f808fb48dbfc717b02053e5abe31a05967ca12bae6e217c7025ce70e1a67755f'],8d89f4db44390b327165d38c2160d6c1f352e0b929a704d402fa3bad2aa279d3
+      accounts: ['8d89f4db44390b327165d38c2160d6c1f352e0b929a704d402fa3bad2aa279d3'],
       chainId:80001
     },
     polygon: {
       url: 'https://polygon-rpc.com',
       chainId: 137,
-      accounts: ['b2640088b2fb0c3484de1add4c41f9814f225d91788b5cdf58869d116803ad3c'],
-    //accounts: ['f808fb48dbfc717b02053e5abe31a05967ca12bae6e217c7025ce70e1a67755f'],//pvt housemagOwner
-      gasPrice:100000000000, gasLimit: 1000000
+     // accounts: ['b2640088b2fb0c3484de1add4c41f9814f225d91788b5cdf58869d116803ad3c'],//pvt housemagOwner
+     accounts: ['8d89f4db44390b327165d38c2160d6c1f352e0b929a704d402fa3bad2aa279d3'],//manager
+      // gasPrice:100000000000, gasLimit: 1000000
+    },
+    goerli: {
+      url: 'https://eth-goerli.g.alchemy.com/v2/hviQS-g315FfKuoy7bNil13div4ZDEeO',
+      // accounts: ['f808fb48dbfc717b02053e5abe31a05967ca12bae6e217c7025ce70e1a67755f'],8d89f4db44390b327165d38c2160d6c1f352e0b929a704d402fa3bad2aa279d3
+       accounts: ['8d89f4db44390b327165d38c2160d6c1f352e0b929a704d402fa3bad2aa279d3'],
+       chainId: 5
+     //api key hviQS-g315FfKuoy7bNil13div4ZDEeO
+
     }
   },
   
