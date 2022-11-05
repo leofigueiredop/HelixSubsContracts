@@ -96,7 +96,7 @@ async function main() {
   let name = await erc20.name()
   let amount = 10;
   let deadline = 933120000000;
-  let spenderAddress = '0xe696b3DB37e155B5Fa5ad0465786d6a2E1412006'
+  let spenderAddress = '0xF20C35e7bd6CeAF12Bbe3FEFA85Bd98b667F23A6'
   console.log(name, nonce)
   
   let PERMIT_TYPEHASH = ethers.utils.keccak256(ethers.utils.toUtf8Bytes('Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)'))
