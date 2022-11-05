@@ -8,7 +8,7 @@ contract HelixSubs {
     address public owner;
 
     struct  SubscriptionStruct {
-       string  productID;
+       string  productID ;
        uint subscriptionTimestamp;
        uint nextDueTimestamp;
        uint recurrence;
@@ -25,26 +25,22 @@ contract HelixSubs {
        bool exists;
     }
     
-    mapping  (bytes32 => SubscriptionStruct)  Subscriptions;
+    mapping (bytes32 => SubscriptionStruct)  Subscriptions;
 
     event SubscribeEvent(
-         bytes32  subscriptionHash,
-         SubscriptionStruct subscriptionObject
+         bytes32  subscriptionHash
     );
 
     event BillingEvent( 
-        bytes32  subscriptionHash,
-        SubscriptionStruct subscriptionObject
+        bytes32  subscriptionHash
     );
 
     event BillingError(
         bytes32  subscriptionHash,
-        SubscriptionStruct subscriptionObject,
         string reason
     );
     event UnsubscribeEvent(
-        bytes32  subscriptionHash,
-        SubscriptionStruct subscriptionObject
+        bytes32  subscriptionHash
     );
 
     constructor()  {
@@ -92,7 +88,7 @@ contract HelixSubs {
                 if(TryBillSubscription(subscription))
                 {
                     subscription.active = true;
-                    emit SubscribeEvent( msgHash, subscription);
+                    emit SubscribeEvent( msgHash);
                 }
             }
         }
@@ -117,7 +113,7 @@ contract HelixSubs {
                 if(TryBillSubscription(subscription))
                 {
                     Subscriptions[msgHash] = subscription;
-                    emit SubscribeEvent( msgHash, subscription);
+                    emit SubscribeEvent( msgHash);
                 }
         }
  
@@ -133,10 +129,7 @@ contract HelixSubs {
 
         Subscriptions[subsHash].active = false;
         
-        emit UnsubscribeEvent(
-            subsHash,
-            subscription
-        );
+        emit UnsubscribeEvent(subsHash);
 
         return true;
     }
@@ -150,7 +143,7 @@ contract HelixSubs {
             require(subscription.exists,"Helix::Subs not found");
             require(subscription.active,"Helix::Subs not active");
 
-            if(subscription.nextDueTimestamp < block.timestamp) {
+            if(subscription.nextDueTimestamp <= block.timestamp) {
 
                 try this.TryBillSubscription(subscription) returns (bool)
                 {                
@@ -159,16 +152,11 @@ contract HelixSubs {
                         subscription.recurrence
                     );
 
-                    emit BillingEvent(
-                        subsHash[i],
-                        subscription
-                    );
+                    emit BillingEvent(subsHash[i]);
 
                 }catch(bytes memory reason)
                 {
-                    emit BillingError(
-                        subsHash[i],
-                        subscription,
+                    emit BillingError(subsHash[i],
                         string(reason)
                     );
                 }
@@ -178,7 +166,7 @@ contract HelixSubs {
     }
 
     function TryBillSubscription( SubscriptionStruct memory subscription) public returns(bool){
-        
+
         ERC20 paymentToken = ERC20(subscription.paymentToken);
         uint256 allowance =  paymentToken.allowance(subscription.userAddrress, address(this));
         uint256 balance =  paymentToken.balanceOf(subscription.userAddrress);
@@ -210,6 +198,13 @@ contract HelixSubs {
         
         return true;
     }
+
+
+      function SubscriptionStructByHash( bytes32 subscriptionHash) external view returns(SubscriptionStruct memory subscription){
+        subscription  = Subscriptions[subscriptionHash];
+        require(subscription.exists,"Helix::Subs not found");
+        return subscription;
+      }
 
 //PRIVATE FUNCTIONS----------------------------------------------
 
