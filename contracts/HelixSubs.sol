@@ -8,6 +8,7 @@ contract HelixSubs {
     address public owner;
 
     struct  SubscriptionStruct {
+       string  subscriptionID;
        string  productID ;
        uint subscriptionTimestamp;
        uint nextDueTimestamp;
@@ -52,17 +53,19 @@ contract HelixSubs {
 //PUBLIC FUNCTIONS -----------------------------------------------------------------------------------
 
     function Subscribe (
-        string calldata productID,
+        string memory productID,
+        string calldata subscriptionID,
         address[5] calldata tokenMerchantHelixCreatorUser_addr,
         uint256[3] calldata merchantHelixCreator_value,
         uint recurrence,
-        string calldata userData, //ID/Name/Email
+        string calldata userData, //ID|Name|Email
         uint8 v, bytes32 r, bytes32 s
     ) public returns(bool sucess) {
-
+        require(msg.sender == owner, "Helix:: Only owner can call subscribe function");
         bytes32 msgHash = keccak256(
             abi.encodePacked(
                 productID,
+                subscriptionID,
                 tokenMerchantHelixCreatorUser_addr,
                 merchantHelixCreator_value,
                 recurrence,
@@ -94,6 +97,7 @@ contract HelixSubs {
         }
         else {             
                 //add new subscription
+                subscription.subscriptionID = subscriptionID;
                 subscription.productID = productID;
                 subscription.subscriptionTimestamp = block.timestamp;
                 subscription.nextDueTimestamp = calculateNextDueTimestamp(block.timestamp,recurrence);
@@ -121,6 +125,9 @@ contract HelixSubs {
     }
     
     function Unsubscribre(bytes32 subsHash) public returns (bool){
+        
+        require(msg.sender == owner, "Helix:: Only owner can call Unsubscribre function");
+
         SubscriptionStruct memory subscription = Subscriptions[subsHash];
         
         require(subscription.exists,"Helix::Subs not found");
@@ -135,7 +142,9 @@ contract HelixSubs {
     }
 
     function Billing(bytes32[] calldata subsHash) public returns (bool) {
+
         require(msg.sender == owner,"Helix::Only owner can call billing function");
+
         for (uint i = 0; i < subsHash.length; i++) {
 
             SubscriptionStruct memory subscription = Subscriptions[subsHash[i]];
