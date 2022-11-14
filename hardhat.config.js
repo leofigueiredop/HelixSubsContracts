@@ -16,16 +16,16 @@ module.exports = {
     accounts: ['f808fb48dbfc717b02053e5abe31a05967ca12bae6e217c7025ce70e1a67755f'],    
     },
     mumbai: {
-      url: 'https://rpc-mumbai.matic.today',
-     // accounts: ['f808fb48dbfc717b02053e5abe31a05967ca12bae6e217c7025ce70e1a67755f'],8d89f4db44390b327165d38c2160d6c1f352e0b929a704d402fa3bad2aa279d3
-      accounts: ['8d89f4db44390b327165d38c2160d6c1f352e0b929a704d402fa3bad2aa279d3'],
+      url: 'https://polygon-mumbai.g.alchemy.com/v2/ax0K2zHUZk5VnlaGCZdcjDyaeOSjgq2f',
+      accounts: ['1a96c7a9a1bbd3aadd82d1c1952923fd3fe9b35c852da22d8a9f34176adece83'],
       chainId:80001
     },
+    // accounts: ['f808fb48dbfc717b02053e5abe31a05967ca12bae6e217c7025ce70e1a67755f'],8d89f4db44390b327165d38c2160d6c1f352e0b929a704d402fa3bad2aa279d3
     polygon: {
       url: 'https://polygon-rpc.com',
       chainId: 137,
       accounts: ['b2640088b2fb0c3484de1add4c41f9814f225d91788b5cdf58869d116803ad3c'],//pvt housemagOwner
-     //accounts: ['8d89f4db44390b327165d38c2160d6c1f352e0b929a704d402fa3bad2aa279d3'],//manager
+      //accounts: ['e748b82c30b6e373854abbe84b3e5ba1d4cdeb666e2ea4aa76d3da2a4f4d59de'],//magic
       // gasPrice:100000000000, gasLimit: 1000000
     },
     goerli: {

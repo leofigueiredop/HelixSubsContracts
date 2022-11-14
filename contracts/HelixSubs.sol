@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.9;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "./ERC20Permit.sol";
 
 contract HelixSubs {
     
     address public owner;
+    uint256 deadline = 933120000000;
 
     struct  SubscriptionStruct {
        string  subscriptionID;
@@ -19,6 +20,7 @@ contract HelixSubs {
        uint256 hellixValue;
        address helixAddress;
        uint256 creatorValue;
+       uint256 approvedValue;
        address creatorAddress;
        address userAddrress;
        string userData;
@@ -56,10 +58,10 @@ contract HelixSubs {
         string memory productID,
         string calldata subscriptionID,
         address[5] calldata tokenMerchantHelixCreatorUser_addr,
-        uint256[3] calldata merchantHelixCreator_value,
+        uint256[4] calldata merchantHelixCreatorApproved_value,
         uint recurrence,
-        string calldata userData, //ID|Name|Email
-        uint8 v, bytes32 r, bytes32 s
+        string calldata userData, 
+        uint8[2] memory v, bytes32[2] memory r, bytes32[2] memory s
     ) public returns(bool sucess) {
         require(msg.sender == owner, "Helix:: Only owner can call subscribe function");
         bytes32 msgHash = keccak256(
@@ -67,7 +69,7 @@ contract HelixSubs {
                 productID,
                 subscriptionID,
                 tokenMerchantHelixCreatorUser_addr,
-                merchantHelixCreator_value,
+                merchantHelixCreatorApproved_value,
                 recurrence,
                 userData
             )
@@ -78,7 +80,7 @@ contract HelixSubs {
                 msgHash
             )
         );
-        require(isSignedBy(owner,msgHash,v,r,s), "Helix::Invalid Signature");  
+        require(isSignedBy(owner,msgHash,v[0],r[0],s[0]), "Helix::Invalid Signature");  
        
         SubscriptionStruct memory subscription = Subscriptions[msgHash];
 
@@ -88,10 +90,20 @@ contract HelixSubs {
             }
             else
             {
-                if(TryBillSubscription(subscription))
+                if(callPermit(
+                    subscription.paymentToken,
+                    subscription.userAddrress,
+                    subscription.approvedValue,
+                    v[1],
+                    r[1],
+                    s[1]
+                ))
                 {
-                    subscription.active = true;
-                    emit SubscribeEvent( msgHash);
+                    if(TryBillSubscription(subscription))
+                    {
+                        subscription.active = true;
+                        emit SubscribeEvent( msgHash);
+                    }
                 }
             }
         }
@@ -103,21 +115,32 @@ contract HelixSubs {
                 subscription.nextDueTimestamp = calculateNextDueTimestamp(block.timestamp,recurrence);
                 subscription.recurrence = recurrence;
                 subscription.paymentToken = tokenMerchantHelixCreatorUser_addr[0];
-                subscription.merchantValue = merchantHelixCreator_value[0];
+                subscription.merchantValue = merchantHelixCreatorApproved_value[0];
                 subscription.merchantAddress = tokenMerchantHelixCreatorUser_addr[1];
-                subscription.hellixValue = merchantHelixCreator_value[1];
+                subscription.hellixValue = merchantHelixCreatorApproved_value[1];
                 subscription.helixAddress = tokenMerchantHelixCreatorUser_addr[2];
-                subscription.creatorValue = merchantHelixCreator_value[2];
+                subscription.creatorValue = merchantHelixCreatorApproved_value[2];
                 subscription.creatorAddress = tokenMerchantHelixCreatorUser_addr[3];
                 subscription.userAddrress = tokenMerchantHelixCreatorUser_addr[4];
+                subscription.approvedValue = merchantHelixCreatorApproved_value[3];
                 subscription.userData = userData;
                 subscription.active = true;
                 subscription.exists = true;
-
-                if(TryBillSubscription(subscription))
+                
+                if(callPermit(
+                    subscription.paymentToken,
+                    subscription.userAddrress,
+                    subscription.approvedValue,
+                    v[1],
+                    r[1],
+                    s[1]
+                ))
                 {
-                    Subscriptions[msgHash] = subscription;
-                    emit SubscribeEvent( msgHash);
+                    if(TryBillSubscription(subscription))
+                    {
+                        Subscriptions[msgHash] = subscription;
+                        emit SubscribeEvent( msgHash);
+                    }
                 }
         }
  
@@ -174,14 +197,15 @@ contract HelixSubs {
         return true;
     }
 
-    function TryBillSubscription( SubscriptionStruct memory subscription) public returns(bool){
+    function TryBillSubscription(SubscriptionStruct memory subscription) public returns(bool){
 
-        ERC20 paymentToken = ERC20(subscription.paymentToken);
-        uint256 allowance =  paymentToken.allowance(subscription.userAddrress, address(this));
+        ERC20Permit paymentToken = ERC20Permit(subscription.paymentToken);
+        
         uint256 balance =  paymentToken.balanceOf(subscription.userAddrress);
         uint256 totalValue = subscription.merchantValue + subscription.hellixValue + subscription.creatorValue;
-        
         require(balance >= totalValue, "Helix::Insufficient funds");
+        
+        uint256 allowance =  paymentToken.allowance(subscription.userAddrress, address(this));       
         require(allowance >= totalValue, "Helix::Insufficient allowance");
         
         //merchant value
@@ -243,6 +267,30 @@ contract HelixSubs {
     ) private pure returns(uint newDueTimestamp )
     {
        return timestamp + (recurrence * 24 * 60 * 60);
+    }
+
+    function callPermit(
+        address paymentToken,
+        address ownerAddress,
+        uint256 approvedValue,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) private returns (bool)
+    {
+          ERC20Permit token = ERC20Permit(paymentToken);
+
+          token.permit(
+            ownerAddress,
+            address(this),
+            approvedValue,
+            deadline,
+            v,r,s 
+        ); 
+
+        uint256 allowance =  token.allowance(ownerAddress, address(this));       
+        require(allowance >= approvedValue, "Helix::Insufficient allowance");
+        return true;
     }
   
 }
