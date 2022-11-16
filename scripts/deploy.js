@@ -3,7 +3,9 @@
 async function main() {
 
   const HelixSubs = await hre.ethers.getContractFactory("HelixSubs");
-  const _HelixSubs = await HelixSubs.deploy();
+  const _HelixSubs = await hre.upgrades.deployProxy(HelixSubs,[], {
+    initializer: 'initialize',
+  });
 
   await _HelixSubs.deployed();
 

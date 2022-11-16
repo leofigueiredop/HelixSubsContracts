@@ -2,12 +2,15 @@
 pragma solidity ^0.8.9;
 
 import "./ERC20Permit.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import '@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol';
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-contract HelixSubs {
+contract HelixSubs is
+    Initializable,
+    OwnableUpgradeable,
+    UUPSUpgradeable {
     
-    address public owner;
-    uint256 deadline = 933120000000;
-
     struct  SubscriptionStruct {
        string  subscriptionID;
        string  productID ;
@@ -21,6 +24,7 @@ contract HelixSubs {
        address helixAddress;
        uint256 creatorValue;
        uint256 approvedValue;
+       uint256 deadline;
        address creatorAddress;
        address userAddrress;
        string userData;
@@ -46,10 +50,13 @@ contract HelixSubs {
         bytes32  subscriptionHash
     );
 
-    constructor()  {
-        owner = msg.sender;
+   
+    function initialize() public initializer {
+      
+        __Ownable_init();
     }
 
+    function _authorizeUpgrade(address) internal override onlyOwner {}
 
 
 //PUBLIC FUNCTIONS -----------------------------------------------------------------------------------
@@ -58,29 +65,30 @@ contract HelixSubs {
         string memory productID,
         string calldata subscriptionID,
         address[5] calldata tokenMerchantHelixCreatorUser_addr,
-        uint256[4] calldata merchantHelixCreatorApproved_value,
+        uint256[6] calldata merchantHelixCreatorApprovedDeadlineTime_value,
         uint recurrence,
         string calldata userData, 
         uint8[2] memory v, bytes32[2] memory r, bytes32[2] memory s
     ) public returns(bool sucess) {
-        require(msg.sender == owner, "Helix:: Only owner can call subscribe function");
+        require(msg.sender == owner(), "Helix:: Only owner can call subscribe function");
         bytes32 msgHash = keccak256(
             abi.encodePacked(
                 productID,
                 subscriptionID,
                 tokenMerchantHelixCreatorUser_addr,
-                merchantHelixCreatorApproved_value,
+                merchantHelixCreatorApprovedDeadlineTime_value,
                 recurrence,
                 userData
             )
         );
 
         msgHash = keccak256(
-            abi.encodePacked("\x19Ethereum Signed Message:\n32",
+            abi.encodePacked(
+                "\x19Ethereum Signed Message:\n32",
                 msgHash
             )
         );
-        require(isSignedBy(owner,msgHash,v[0],r[0],s[0]), "Helix::Invalid Signature");  
+        require(isSignedBy(owner(),msgHash,v[0],r[0],s[0]), "Helix::Invalid Signature");  
        
         SubscriptionStruct memory subscription = Subscriptions[msgHash];
 
@@ -94,6 +102,7 @@ contract HelixSubs {
                     subscription.paymentToken,
                     subscription.userAddrress,
                     subscription.approvedValue,
+                    subscription.deadline,
                     v[1],
                     r[1],
                     s[1]
@@ -115,14 +124,15 @@ contract HelixSubs {
                 subscription.nextDueTimestamp = calculateNextDueTimestamp(block.timestamp,recurrence);
                 subscription.recurrence = recurrence;
                 subscription.paymentToken = tokenMerchantHelixCreatorUser_addr[0];
-                subscription.merchantValue = merchantHelixCreatorApproved_value[0];
+                subscription.merchantValue = merchantHelixCreatorApprovedDeadlineTime_value[0];
                 subscription.merchantAddress = tokenMerchantHelixCreatorUser_addr[1];
-                subscription.hellixValue = merchantHelixCreatorApproved_value[1];
+                subscription.hellixValue = merchantHelixCreatorApprovedDeadlineTime_value[1];
                 subscription.helixAddress = tokenMerchantHelixCreatorUser_addr[2];
-                subscription.creatorValue = merchantHelixCreatorApproved_value[2];
+                subscription.creatorValue = merchantHelixCreatorApprovedDeadlineTime_value[2];
                 subscription.creatorAddress = tokenMerchantHelixCreatorUser_addr[3];
                 subscription.userAddrress = tokenMerchantHelixCreatorUser_addr[4];
-                subscription.approvedValue = merchantHelixCreatorApproved_value[3];
+                subscription.approvedValue = merchantHelixCreatorApprovedDeadlineTime_value[3];
+                subscription.deadline = merchantHelixCreatorApprovedDeadlineTime_value[4];
                 subscription.userData = userData;
                 subscription.active = true;
                 subscription.exists = true;
@@ -131,6 +141,7 @@ contract HelixSubs {
                     subscription.paymentToken,
                     subscription.userAddrress,
                     subscription.approvedValue,
+                    subscription.deadline,
                     v[1],
                     r[1],
                     s[1]
@@ -149,7 +160,7 @@ contract HelixSubs {
     
     function Unsubscribre(bytes32 subsHash) public returns (bool){
         
-        require(msg.sender == owner, "Helix:: Only owner can call Unsubscribre function");
+        require(msg.sender == owner(), "Helix:: Only owner can call Unsubscribre function");
 
         SubscriptionStruct memory subscription = Subscriptions[subsHash];
         
@@ -166,7 +177,7 @@ contract HelixSubs {
 
     function Billing(bytes32[] calldata subsHash) public returns (bool) {
 
-        require(msg.sender == owner,"Helix::Only owner can call billing function");
+        require(msg.sender == owner(),"Helix::Only owner can call billing function");
 
         for (uint i = 0; i < subsHash.length; i++) {
 
@@ -273,6 +284,7 @@ contract HelixSubs {
         address paymentToken,
         address ownerAddress,
         uint256 approvedValue,
+        uint256 deadline,
         uint8 v,
         bytes32 r,
         bytes32 s

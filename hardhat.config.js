@@ -1,6 +1,7 @@
 const { Network } = require("alchemy-sdk");
-
+require("@openzeppelin/hardhat-upgrades");
 require("@nomicfoundation/hardhat-toolbox");
+require("@nomiclabs/hardhat-ethers");
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
@@ -44,3 +45,5 @@ module.exports = {
      apiKey:"NE6D9Z8MQSHDAIDQX34SKAY75MUE3SBSPP", //poly
   }
 };
+//new subs https://mumbai.polygonscan.com/address/0x5594aa5127E68605367e6Cc2E45F5dB418559a38#code
+//proxy 0xDD4aa8f342832f6dBB5a2710C7E616411d16e032

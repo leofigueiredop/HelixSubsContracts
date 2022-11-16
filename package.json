@@ -2,6 +2,8 @@
   "dependencies": {
     "@nomicfoundation/hardhat-toolbox": "^2.0.0",
     "@openzeppelin/contracts": "^4.8.0",
+    "@openzeppelin/contracts-upgradeable": "^4.8.0",
+    "@openzeppelin/hardhat-upgrades": "^1.21.0",
     "alchemy-sdk": "^2.2.0",
     "chai": "^4.3.6",
     "eth-permit": "^0.2.3",
