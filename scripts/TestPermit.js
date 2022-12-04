@@ -12,7 +12,7 @@ async function main() {
  
   
   let signerAddress = await signer.getAddress()
-  let tokenAddress = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174'
+  let tokenAddress = '0xe6b8a5CF854791412c1f6EFC7CAf629f5Df1c747'
   
   let abi = [
     {
@@ -98,14 +98,14 @@ async function main() {
   let name = await erc20.name()
   let amount = 182666666 ;
   let deadline = 933120000000;
-  let spenderAddress = '0x2dcaf327B749EB5A694E3c657D98c230060d35b1'
+  let spenderAddress = '0xDD4aa8f342832f6dBB5a2710C7E616411d16e032'
   console.log(name, nonce)
   
   let PERMIT_TYPEHASH = ethers.utils.keccak256(ethers.utils.toUtf8Bytes('Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)'))
-  console.log('PERMIT_TYPEHASH', PERMIT_TYPEHASH) // 0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9
+  //console.log('PERMIT_TYPEHASH', PERMIT_TYPEHASH) // 0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9
   
   let EIP712_DOMAIN_TYPEHASH = ethers.utils.keccak256(ethers.utils.toUtf8Bytes('EIP712Domain(string name,string version,address verifyingContract,bytes32 salt)'))
-  console.log('EIP712_DOMAIN_TYPEHASH', EIP712_DOMAIN_TYPEHASH) //0x36c25de3e541d5d970f66e4210d728721220fff5c077cc6cd008b3a0c62adab7
+  //console.log('EIP712_DOMAIN_TYPEHASH', EIP712_DOMAIN_TYPEHASH) //0x36c25de3e541d5d970f66e4210d728721220fff5c077cc6cd008b3a0c62adab7
   
   let DOMAIN_SEPARATOR = ethers.utils.keccak256(
     ethers.utils.defaultAbiCoder.encode(
@@ -121,17 +121,17 @@ async function main() {
         ethers.utils.keccak256(ethers.utils.toUtf8Bytes(name)),
         ethers.utils.keccak256(ethers.utils.toUtf8Bytes("1")),
         tokenAddress,
-        ethers.utils.hexZeroPad(ethers.BigNumber.from(137).toHexString(), 32)
+        ethers.utils.hexZeroPad(ethers.BigNumber.from(80001).toHexString(), 32)
       ]
     )
   )
-  console.log('DOMAIN_SEPARATOR', DOMAIN_SEPARATOR)
+//console.log('DOMAIN_SEPARATOR', DOMAIN_SEPARATOR)
   
   let domain = {
     name: name,
-    version: "1",
+    version: "2",
     verifyingContract: tokenAddress,
-    salt: ethers.utils.hexZeroPad(ethers.BigNumber.from(137).toHexString(), 32)
+    salt: ethers.utils.hexZeroPad(ethers.BigNumber.from(80001).toHexString(), 32)
   }
   let types = {
     Permit: [
