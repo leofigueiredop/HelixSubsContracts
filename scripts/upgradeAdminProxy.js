@@ -1,6 +1,6 @@
 const { ethers, upgrades } = require("hardhat");
 
-const UPGRADEABLE_PROXY = "0xDD4aa8f342832f6dBB5a2710C7E616411d16e032";
+const UPGRADEABLE_PROXY = "0x6907204637817353d940EC00E4a3FB7e735DEE5A";
 
 async function main() {
    const gas = await ethers.provider.getGasPrice()
