@@ -4,7 +4,7 @@ require("@nomicfoundation/hardhat-toolbox");
 require("@nomiclabs/hardhat-ethers");
 
 module.exports = {
-  solidity: "0.8.9",
+  solidity: "0.6.12",
   networks: {
     rinkeby: {
       url: 'https://rinkeby.infura.io/v3/6c9abdd3278e4bf89314f691128dc225',
@@ -18,7 +18,7 @@ module.exports = {
     mumbai: {
       url: 'https://polygon-mumbai.g.alchemy.com/v2/ax0K2zHUZk5VnlaGCZdcjDyaeOSjgq2f',
       //accounts: ['8d89f4db44390b327165d38c2160d6c1f352e0b929a704d402fa3bad2aa279d3'],
-      accounts: ['8c0d4aafbf6364ca827b8e3b2a5533669e6397dc3aa9d9b832a9d7e7a251fa6d'],//hlx owner
+      accounts: ['cae60c5fd80022d2da1211a5abecbcee61e1284adce5625daf95fae08ad9f1e8'],//hlx owner
       //accounts: ['8d89f4db44390b327165d38c2160d6c1f352e0b929a704d402fa3bad2aa279d3'],
       chainId:80001
     },
@@ -26,7 +26,8 @@ module.exports = {
     polygon: {
       url: 'https://polygon-rpc.com',
       chainId: 137,
-      accounts: ['b2640088b2fb0c3484de1add4c41f9814f225d91788b5cdf58869d116803ad3c'],//pvt housemagOwner
+      accounts: ['8c0d4aafbf6364ca827b8e3b2a5533669e6397dc3aa9d9b832a9d7e7a251fa6d'],//pvt hlxowner
+     // accounts: ['b2640088b2fb0c3484de1add4c41f9814f225d91788b5cdf58869d116803ad3c'],//pvt housemagOwner
       //accounts: ['e748b82c30b6e373854abbe84b3e5ba1d4cdeb666e2ea4aa76d3da2a4f4d59de'],//magic
       // gasPrice:100000000000, gasLimit: 1000000
     },

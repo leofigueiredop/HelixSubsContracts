@@ -91,14 +91,15 @@ async function main() {
       type: "function"
     },
   ]
+
   
   let erc20 = new ethers.Contract(tokenAddress, abi, provider)
 
   let nonce = await erc20.nonces(signerAddress)
   let name = await erc20.name()
-  let amount = 400000 ;
+  let amount = 6000000 ;
   let deadline = 933120000000;
-  let spenderAddress = '0x4CCCFa116F185974cBC30ad330f22514Be7a16Fc'
+  let spenderAddress = '0x2C32f402ac34aCbE0d6999CD71409cC07bD31978'
   console.log(name, nonce)
   
   let PERMIT_TYPEHASH = ethers.utils.keccak256(ethers.utils.toUtf8Bytes('Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)'))
